@@ -1,7 +1,7 @@
 let Config = {
     updateTime: 10, // seconds
     symbolsAfterComma: 4,
-    dateFormat: ''
+    dateFormat: 'mm:ss'
 };
 
 module.exports = Config;

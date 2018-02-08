@@ -8,11 +8,15 @@ class AbstractApi {
     }
 
     url(){
-        throw new Error('method not implemented');
+        throw new Error('url method not implemented');
     }
 
     getPrice(){
-        throw new Error('method not implemented');
+        throw new Error('getPrice method not implemented');
+    }
+
+    updatePrice(){
+        throw new Error('updatePrice method not implemented');
     }
 
     on(eventName, subscriber){

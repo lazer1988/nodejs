@@ -5,7 +5,9 @@ class CoinMarketCapApi extends AbstractApi {
     constructor(){
         super();
 
-        this.price = 23;
+        this.price = 0;
+
+        console.log('init CoinMarketCapApi');
     }
 
     url(){
@@ -25,12 +27,12 @@ class CoinMarketCapApi extends AbstractApi {
     _makeRequest(){
         var $this = this;
 
-        https.get(this.url(), function(response){
+        https.get(this.url(), response => {
             var body = '';
-            response.on('data', function(d) {
+            response.on('data', d => {
                 body += d;
             });
-            response.on('end', function() {
+            response.on('end', () => {
                 let parsed = JSON.parse(body);
 
                 $this.price = parsed[0].price_usd;

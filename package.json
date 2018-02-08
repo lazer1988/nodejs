@@ -1,9 +1,17 @@
 {
   "name": "alex-nodejs-bitcoin",
   "version": "0.0.1",
-  "main": "app.js",
+  "main": "index.js",
+  "description": "test project",
+  "engines": {
+    "node": ">=7.0"
+  },
+  "repository":{
+    "type": "git",
+    "url": "https://github.com/lazer1988/nodejs.git"
+  },
   "dependencies": {
-    "crypto": "^1.0.1",
-    "ws": "^4.0.0"
+    "ws": "^4.0.0",
+    "moment": "^2.20.1"
   }
 }

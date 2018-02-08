@@ -6,36 +6,51 @@ class CexIOApi extends AbstractApi {
     constructor(){
         super();
 
+        this.price = 0;
+
         this.apiKey = '56AjQfv7n2HGZNVmAwYzHgoIzwM';
         this.apiSecret = '7QKuS3yQpwoGOWemk1kkgnyCK9Q';
+
+        console.log('init CexIOApi');
     }
 
     url(){
-        return 'qweqwe';
+        return 'wss://ws.cex.io/ws/';
     }
 
     getPrice(){
-        return 22;
+        return this.price;
     }
 
     updatePrice(){
-        var ws = new WebSocket("wss://ws.cex.io/ws/");
+        var ws = new WebSocket(this.url());
         var $this = this;
 
-        ws.on('open', function(){
+        ws.on('open', () => {
             ws.send($this.createAuthRequest());
+            console.log('CexIOApi WebSocket connected');
         });
 
-        ws.on('message', function(message){
-            console.log(message);
-            let data = JSON.parse(message);
+        ws.on('message', message => {
+            let response = JSON.parse(message);
 
-            switch (data.e) {
+            switch (response.e) {
                 case 'auth':
-
+                    if (response.ok == 'ok') {
+                        ws.send('{"e":"subscribe","rooms":["tickers"]}');
+                        console.log('CexIOApi auth success');
+                    } else {
+                        throw new Error("cex.io auth has fail check your api keys");
+                    }
                     break;
                 case 'ping':
                     ws.send('{"e":"pong"}');
+                    break;
+                case 'tick':
+                    if (response.data.symbol1 == 'BTC' && response.data.symbol2 == 'USD') {
+                        $this.price = response.data.price;
+                        $this.trigger('updated');
+                    }
                     break;
             }
         });
