@@ -14,9 +14,6 @@ class App{
 
         this.priceDiff = null;
 
-        this.mainPrice = 0;
-        this.comparePrice = 0;
-
         this.mainApi = mainApi;
         this.compareApi = compareApi;
     }
@@ -25,24 +22,18 @@ class App{
         var $this = this;
 
         this.mainApi.updatePrice();
-        this.mainApi.on('updated', function(){
-            $this.mainPrice = $this.mainApi.getPrice();
-            $this.comparePrices();
-        });
+        this.mainApi.on('updated', () => $this.comparePrices());
 
         this.compareApi.updatePrice();
-        this.compareApi.on('updated', function(){
-            $this.comparePrice = $this.compareApi.getPrice();
-            $this.comparePrices();
-        });
+        this.compareApi.on('updated', () => $this.comparePrices());
     }
 
     comparePrices(){
-        if (this.mainPrice === 0 || this.comparePrice === 0) {
+        if (this.mainApi.getPrice() === 0 || this.compareApi.getPrice() === 0) {
             return;
         }
 
-        let percent = parseFloat((this.mainPrice*100/this.comparePrice) - 100).toFixed(Config.symbolsAfterComma);
+        let percent = parseFloat((this.mainApi.getPrice()*100/this.compareApi.getPrice()) - 100).toFixed(Config.symbolsAfterComma);
 
         if (this.priceDiff !== percent) {
             this.priceDiff = percent;
