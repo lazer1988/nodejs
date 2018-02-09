@@ -19,13 +19,11 @@ class App{
     }
 
     run(){
-        var $this = this;
-
         this.mainApi.update();
-        this.mainApi.on('updated', () => $this.comparePrices());
+        this.mainApi.on('updated', () => this.comparePrices());
 
         this.compareApi.update();
-        this.compareApi.on('updated', () => $this.comparePrices());
+        this.compareApi.on('updated', () => this.comparePrices());
     }
 
     comparePrices(){
