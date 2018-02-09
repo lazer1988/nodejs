@@ -21,10 +21,10 @@ class App{
     run(){
         var $this = this;
 
-        this.mainApi.updatePrice();
+        this.mainApi.update();
         this.mainApi.on('updated', () => $this.comparePrices());
 
-        this.compareApi.updatePrice();
+        this.compareApi.update();
         this.compareApi.on('updated', () => $this.comparePrices());
     }
 

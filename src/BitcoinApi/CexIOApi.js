@@ -6,54 +6,75 @@ class CexIOApi extends AbstractApi {
     constructor(){
         super();
 
+        this.ws = null; // web socket
         this.price = 0;
 
         this.apiKey = '56AjQfv7n2HGZNVmAwYzHgoIzwM';
         this.apiSecret = '7QKuS3yQpwoGOWemk1kkgnyCK9Q';
 
-        console.log('init CexIOApi');
+        console.log('init'.green+' CexIOApi');
     }
 
+    /**
+     * @inheritDoc
+     */
     url(){
         return 'wss://ws.cex.io/ws/';
     }
 
+    /**
+     * @inheritDoc
+     */
     getPrice(){
         return this.price;
     }
 
-    updatePrice(){
-        var ws = new WebSocket(this.url());
-        var $this = this;
+    /**
+     * @inheritDoc
+     */
+    update(){
+        this.ws = new WebSocket(this.url());
 
-        ws.on('open', () => {
-            ws.send($this.createAuthRequest());
-            console.log('CexIOApi WebSocket connected');
+        this.ws.on('open', () => {
+            this.ws.send(this.createAuthRequest());
+            console.log('CexIOApi WebSocket '+'connected'.green);
         });
 
-        ws.on('message', message => {
-            let response = JSON.parse(message);
+        this.ws.on('message', message => {
+            let response;
+
+            try {
+                response = JSON.parse(message);
+            } catch (e) {
+                console.log((e.name+': '+e.message).red);
+            }
 
             switch (response.e) {
                 case 'auth':
                     if (response.ok == 'ok') {
-                        ws.send('{"e":"subscribe","rooms":["tickers"]}');
-                        console.log('CexIOApi auth success');
+                        this.ws.send('{"e":"subscribe","rooms":["tickers"]}');
+                        console.log('CexIOApi auth '+'success'.green);
                     } else {
                         throw new Error("cex.io auth has fail check your api keys");
                     }
                     break;
                 case 'ping':
-                    ws.send('{"e":"pong"}');
+                    this.ws.send('{"e":"pong"}');
                     break;
                 case 'tick':
                     if (response.data.symbol1 == 'BTC' && response.data.symbol2 == 'USD') {
-                        $this.price = response.data.price;
-                        $this.trigger('updated');
+                        this.price = response.data.price;
+                        this.trigger('updated');
                     }
                     break;
             }
         });
+    }
+
+    closeWS(){
+        if (this.ws) {
+            this.ws.terminate();
+        }
     }
 
     createSignature(timestamp, apiKey, apiSecret){
