@@ -9,7 +9,7 @@ describe('CexIOApi#update()', function(){
         api.on('updated', function() {
             this.closeWS();
 
-            if (!isNaN(parseFloat(this.getPrice())) && isFinite(this.getPrice())) {
+            if (!isNaN(parseFloat(this.getPrice())) && isFinite(this.getPrice()) && this.getPrice() > 0) {
                 done();
             }
         });
