@@ -29,18 +29,26 @@ class CexIOApi extends AbstractApi {
         return this.price;
     }
 
+    getWSClient(){
+        if (this.ws === null) {
+            this.ws = new WebSocket(this.url());
+        }
+
+        return this.ws;
+    }
+
     /**
      * @inheritDoc
      */
     update(){
-        this.ws = new WebSocket(this.url());
+        let ws = this.getWSClient();
 
-        this.ws.on('open', () => {
-            this.ws.send(this.createAuthRequest());
+        ws.on('open', () => {
+            ws.send(this.createAuthRequest());
             console.log('CexIOApi WebSocket '+'connected'.green);
         });
 
-        this.ws.on('message', message => {
+        ws.on('message', message => {
             let response;
 
             try {
@@ -52,14 +60,14 @@ class CexIOApi extends AbstractApi {
             switch (response.e) {
                 case 'auth':
                     if (response.ok == 'ok') {
-                        this.ws.send('{"e":"subscribe","rooms":["tickers"]}');
+                        ws.send('{"e":"subscribe","rooms":["tickers"]}');
                         console.log('CexIOApi auth '+'success'.green);
                     } else {
                         throw new Error("cex.io auth has fail check your api keys");
                     }
                     break;
                 case 'ping':
-                    this.ws.send('{"e":"pong"}');
+                    ws.send('{"e":"pong"}');
                     break;
                 case 'tick':
                     if (response.data.symbol1 == 'BTC' && response.data.symbol2 == 'USD') {
